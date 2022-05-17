@@ -1,4 +1,4 @@
-const express = require("express")
+const express = require("express");
 const hotelRouter = require("./hotelRouter");
 const userRouter = require("./userRouter");
 

@@ -4,7 +4,7 @@ const db = require('../../config/db');
 class TokenService {
 
   generateToken(payload) {
-    const accessToken = jwt.sign(payload, process.env.JWT_ACCESS_SECRET, {expiresIn: '1h'});
+    const accessToken = jwt.sign(payload, process.env.JWT_ACCESS_SECRET, {expiresIn: '30s'});
     const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET, {expiresIn: '30d'});
 
     return {
@@ -26,6 +26,30 @@ class TokenService {
 
   async deleteToken(refreshToken) {
     const tokenRequest = await db.query(`DELETE FROM token WHERE "refreshToken"=$1 RETURNING "refreshToken";`, [refreshToken]);
+    const token = tokenRequest.rows[0].refreshToken;
+    return token;
+  }
+
+  validateAccessToken(token) {
+    try {
+      const userData = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+      return userData;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  validateRefreshToken(token) {
+    try {
+      const userData = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+      return userData;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  async findToken(refreshToken) {
+    const tokenRequest = await db.query(`SELECT "refreshToken" FROM token WHERE "refreshToken" = $1;`, [refreshToken]);
     const token = tokenRequest.rows[0].refreshToken;
     return token;
   }

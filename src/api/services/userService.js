@@ -74,6 +74,45 @@ class UserService {
     const token = await tokenService.deleteToken(refreshToken);
     return token;
   }
+
+  async refresh(refreshToken) {
+    if(!refreshToken) {
+      throw ApiError.UnauthorizedError();
+    }
+    const userData = tokenService.validateRefreshToken(refreshToken);
+    const tokenFromDB = tokenService.findToken(refreshToken);
+
+    if(!userData || !tokenFromDB) {
+      throw ApiError.UnauthorizedError();
+    }
+
+    const userRequest = await db.query(`SELECT id, email, "firstName", "lastName", "userName", role FROM "user" WHERE id = $1;`, [userData.id])
+    const user = userRequest.rows[0];
+
+    const userDto = {
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      userName: user.userName,
+      role: user.role
+    }
+    
+    const tokens = tokenService.generateToken({...userDto});
+    await tokenService.saveToken(user.id, tokens.refreshToken);
+
+    return {
+      ...tokens,
+      user: userDto
+    }
+  }
+
+  async getAllUsers() {
+    const usersRequest = await db.query(`SELECT * FROM "user";`);
+    const users = usersRequest.rows;
+
+    return users;
+  }
 }
 
 module.exports = new UserService();
