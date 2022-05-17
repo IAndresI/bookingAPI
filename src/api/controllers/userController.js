@@ -5,7 +5,11 @@ const ApiError = require('../helpers/apiError');
 class UserController {
   async login(req, res, next) {
     try {
-      res.json("login")
+      const {emailOrUserName, password} = req.body;
+      const userData = await userServive.login(emailOrUserName, password);
+
+      res.cookie("refreshToken", userData.refreshToken, {httpOnly: true, maxAge: 30*24*60*60*1000});
+      return res.json(userData);
     } catch (error) {
       next(error);
     }
@@ -29,7 +33,10 @@ class UserController {
 
   async logout(req, res, next) {
     try {
-      res.json("logout")
+      const {refreshToken} = req.cookies;
+      const token = await userServive.logout(refreshToken);
+      res.clearCookie('refreshToken');
+      return res.json(token)
     } catch (error) {
       next(error);
     }
