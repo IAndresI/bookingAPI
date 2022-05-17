@@ -12,7 +12,7 @@ router.post('/register',
   body('password').isLength({min: 3, max: 32}),
   userController.register
 )
-router.post('/refresh', userController.refresh)
+router.get('/refresh', userController.refresh)
 router.get('/', authMiddleware, userController.getUsers)
 
 module.exports = router;

@@ -31,7 +31,7 @@ class UserService {
 
     return {
       ...tokens,
-      user: userDto
+      data: userDto
     }
   }
 
@@ -66,7 +66,7 @@ class UserService {
 
     return {
       ...tokens,
-      user: userDto
+      data: userDto
     }
   }
 
@@ -103,7 +103,7 @@ class UserService {
 
     return {
       ...tokens,
-      user: userDto
+      data: userDto
     }
   }
 
