@@ -4,7 +4,9 @@ const ApiError = require('../helpers/apiError');
 
 class UserService {
 
-  async register({email, password, firstName, lastName, phone}) {
+  async register({email, password, firstName, lastName, phone, userName}) {
+
+    console.log(userName);
 
     const candidate = await db.query("SELECT * FROM isEmailAlreadyRegistred($1);", [email]);
 
@@ -13,8 +15,8 @@ class UserService {
     }
 
     const userRequest = await db.query(
-      "SELECT * FROM createuser($1, $2, $3, $4, $5);",
-      [email, password, firstName, lastName, phone]
+      "SELECT * FROM createuser($1, $2, $3, $4, $5, $6);",
+      [email, password, firstName, lastName, phone, userName]
     );
     const user = userRequest.rows[0];
     const userDto = {
